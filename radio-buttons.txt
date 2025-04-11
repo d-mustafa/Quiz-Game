@@ -1,0 +1,31 @@
+// HTML
+
+<div id="question-text">What is 1 + 1?</div>
+<form id="quiz-form">
+  <label><input type="radio" name="answer" value="0"> 0</label><br>
+  <label><input type="radio" name="answer" value="1"> 1</label><br>
+  <label><input type="radio" name="answer" value="2"> 2</label><br>
+  <label><input type="radio" name="answer" value="3"> 3</label><br>
+  <button type="button" id="submit-btn">Submit</button>
+</form>
+
+
+// JAVASCRIPT
+document.getElementById("submit-btn").addEventListener("click", function() {
+  const radios = document.getElementsByName("answer");
+  let selectedValue = null;
+
+  for (let radio of radios) {
+    if (radio.checked) {
+      selectedValue = radio.value;
+      break;
+    }
+  }
+
+  if (selectedValue !== null) {
+    alert("You selected: " + selectedValue);
+    // Now compare selectedValue with the correct answer index or value
+  } else {
+    alert("Please select an answer.");
+  }
+});
