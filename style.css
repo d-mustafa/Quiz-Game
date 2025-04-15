@@ -31,3 +31,17 @@ button {
   width: 100%;
   margin: 10px 0;
 }
+
+img {
+  width: 200px;
+}
+
+.red {
+  color: red;
+}
+.green {
+  color: green;
+}
+.blue {
+  color: blue;
+}
