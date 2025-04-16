@@ -1,8 +1,9 @@
 // Quiz Game
 
-let currentQuestion = 0;
+let currentQuestion = 1;
 let score = 0;
 let highscore = "";
+let usedQuestions = [];
 
 const startBtn = document.getElementById("start-btn");
 const restartBtn = document.getElementById("restart-btn");
@@ -17,13 +18,14 @@ const scoreText = document.getElementById("score-text");
 // Store your quiz questions, multiple choice options, and correct answer in an associative array
 // Questions
 let questionList = [
-  {question: 'Whats this colorful logo called?', img: 'Quiz-Game Images/google.jpg', answer: 'Google', correct: false, feedback: ""},
-  {question: 'Whats this fox-like logo?', img: 'Quiz-Game Images/firefox.jpg', answer: 'Firefox', correct: false, feedback: ""},
-  {question: 'What game does this blocky logo come from?', img: 'Quiz-Game Images/minecraft.jpg', answer: 'Minecraft', correct: false, feedback: ""},
-  {question: 'What is this multiplayer game?', img: 'Quiz-Game Images/roblox.jpg', answer: 'Roblox', correct: false, feedback: ""},
-  {question: 'What operating system uses this logo?', img: 'Quiz-Game Images/windows.png', answer: 'Windows', correct: false, feedback: ""},
-  {question: 'What Popular IDE has this logo?', img: 'Quiz-Game Images/vscode.png', answer: 'Visual Studio Code', correct: false, feedback: ""},
+  {question: 'Whats this colorful logo called?', img: 'Quiz-Game Images/google.jpg', answer: 'Google', feedback: ""},
+  {question: 'Whats this fox-like logo?', img: 'Quiz-Game Images/firefox.jpg', answer: 'Firefox', feedback: ""},
+  {question: 'What game does this blocky logo come from?', img: 'Quiz-Game Images/minecraft.jpg', answer: 'Minecraft', feedback: ""},
+  {question: 'What is this multiplayer game?', img: 'Quiz-Game Images/roblox.jpg', answer: 'Roblox', feedback: ""},
+  {question: 'What operating system uses this logo?', img: 'Quiz-Game Images/windows.png', answer: 'Windows', feedback: ""},
+  {question: 'What Popular IDE has this logo?', img: 'Quiz-Game Images/vscode.png', answer: 'Visual Studio Code', feedback: ""},
 ]
+
 // Answers
 let answerList = [
   ["Edge", "Chrome", "Google", "Opera"],
@@ -34,15 +36,21 @@ let answerList = [
   ["Visual Studio Code", "NetBeans", "Xcode", "Roblox Studio"],
 ]
 
+let randQuestion = Math.floor(Math.random() * questionList.length); // variable must be made after questionList is initialized
+
 startBtn.addEventListener("click", startQuiz);
 restartBtn.addEventListener("click", restartQuiz);
 
 function startQuiz() {
   startScreen.classList.add("hidden");
   quizScreen.classList.remove("hidden");
-  currentQuestion = 0;
+  currentQuestion = 1;
   score = 0;
-  showQuestion(questionList[0], answerList[0]);
+  usedQuestions = [];
+
+  // randomly decides which question should be next
+  usedQuestions.push(questionList[randQuestion]["question"]);
+  showQuestion(questionList[randQuestion], answerList[randQuestion]);
 }
 
 // Displays the appropriate question onscreen. You may add a parameter if you like.
@@ -52,11 +60,15 @@ function showQuestion(questionObj, answerObj) {
   const labels = document.getElementsByTagName("label");
 
   let randAnswers = [];
+  
+  // loops through all the labels in the document and replaces their values and text
   for (let i = 0 ; i < labels.length; i++) {
-    let rand = Math.floor(Math.random() * 4);
+    // randomly decides the order of the answers
+    let rand = Math.floor(Math.random() * answerObj.length);
     let chosenAnswer = answerObj[rand];
-    while (randAnswers.includes(chosenAnswer)) {
-      rand = Math.floor(Math.random() * 4);
+
+    while (randAnswers.includes(chosenAnswer)) { // safeguard to avoid duplicate answers
+      rand = Math.floor(Math.random() * answerObj.length);
       chosenAnswer = answerObj[rand];
     }
     randAnswers.push(chosenAnswer);
@@ -80,9 +92,16 @@ document.getElementById("submit-btn").addEventListener("click", function() {
     alert("You selected: " + selectedValue);
     // Now compare selectedValue with the correct answer index or value
     checkAnswer(selectedValue);
-    if (currentQuestion+1 < questionList.length) {
+    if (currentQuestion < questionList.length) {
       currentQuestion++;
-      showQuestion(questionList[currentQuestion], answerList[currentQuestion]);
+
+      randQuestion = Math.floor(Math.random() * questionList.length);
+      while(usedQuestions.includes(questionList[randQuestion]["question"])){  // safeguard to avoid duplicate questions
+        randQuestion = Math.floor(Math.random() * questionList.length);
+      }
+      usedQuestions.push(questionList[randQuestion]["question"]);
+
+      showQuestion(questionList[randQuestion], answerList[randQuestion]);
     } else {
       quizScreen.classList.add("hidden");
       resultScreen.classList.remove("hidden");
@@ -96,31 +115,24 @@ document.getElementById("submit-btn").addEventListener("click", function() {
 // Checks if the answer is correct. This answer should be read from the site and passed as a parameter.
 // You may add additional parameters, as needed.
 function checkAnswer(selectedAnswer) {
-  let actualAnswer = questionList[currentQuestion].answer;
+  let actualAnswer = questionList[randQuestion].answer;
   if(selectedAnswer == actualAnswer) {
-    questionList[currentQuestion].correct = true;
     score++;
-    questionList[currentQuestion].feedback = `Question: ${questionList[currentQuestion]["question"]} | Your Answer: <span class='green'>${selectedAnswer}</span> <br>`;
+    questionList[randQuestion].feedback = `Question: ${questionList[randQuestion]["question"]} | Your Answer: <span class='green'>${selectedAnswer}</span> <br>`;
   } else {
-    questionList[currentQuestion].feedback = `Question: ${questionList[currentQuestion]["question"]} | Your Answer: <span class='red'>${selectedAnswer}</span> <br>`;
+    questionList[randQuestion].feedback = `Question: ${questionList[randQuestion]["question"]} | Your Answer: <span class='red'>${selectedAnswer}</span> <br>`;
   }
 }
 
 // Displays results of the quiz:  The more detailed results, the better! Users should see feedback from
 // each question.
 function showResults() {
-  scoreText.innerHTML = `Your Final Score: ${score}/${questionList.length}`;
+  percentage = Math.round(score/questionList.length * 100);
+  scoreText.innerHTML = `Your Final Score: ${score}/${questionList.length}  |  ${percentage}%`;
 
   // Displays each question and if you got them correct or not
   for (let question in questionList) {
-    if (questionList[question]["correct"]){
-      scoreText.innerHTML += `<p>${questionList[question]["feedback"]}</p>`;
-    }
-  }
-  for (let question in questionList) {
-    if (!questionList[question]["correct"]){
-      scoreText.innerHTML += `<p>${questionList[question]["feedback"]}</p>`;
-    }
+    scoreText.innerHTML += `<p>${questionList[question]["feedback"]}</p>`;
   }
 
   if(score == questionList.length) {
