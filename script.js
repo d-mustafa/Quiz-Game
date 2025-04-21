@@ -36,7 +36,7 @@ let answerList = [
   ["Visual Studio Code", "NetBeans", "Xcode", "Roblox Studio"],
 ]
 
-let randQuestion = Math.floor(Math.random() * questionList.length); // variable must be made after questionList is initialized
+let randQuestion; // variable must be made after questionList is initialized
 
 startBtn.addEventListener("click", startQuiz);
 restartBtn.addEventListener("click", restartQuiz);
@@ -48,7 +48,8 @@ function startQuiz() {
   score = 0;
   usedQuestions = [];
 
-  // randomly decides which question should be next
+  // randomly decides which question should be first
+  randQuestion = Math.floor(Math.random() * questionList.length);
   usedQuestions.push(questionList[randQuestion]["question"]);
   showQuestion(questionList[randQuestion], answerList[randQuestion]);
 }
